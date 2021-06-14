@@ -39,10 +39,22 @@ router.post('/', async (req, res) => {
     return res.status(500);
 });
 
+router.patch('/:id', async (req, res) => {
+    try {
+        let id = req.params.id;
+        let updatedUser = await User.findByIdAndUpdate(Object(id), req.body, { new: true })
+        return res.status(200).json(updatedUser);
+    } 
+    catch(e) {
+        console.log(e);
+    }
+    return res.status(500);
+});
+
 router.delete('/:id', async (req, res) => {
     try {
         let id = req.params.id;
-        let user = await User.deleteOne({ _id: Object(id) })
+        let user = await User.findByIdAndDelete({ _id: Object(id) })
         return res.status(200).json(user);
 
     }

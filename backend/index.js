@@ -6,6 +6,7 @@ const app = express()
 const port = 3000
 
 const uri = 'mongodb://127.0.0.1:27017/MernStack';
+mongoose.set('useFindAndModify', false);
 mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;

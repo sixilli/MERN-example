@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 
-import BasicTable from '../components/table'
+import BasicTable from '../components/Table'
+import ModalEditor from '../components/ModalEditor'
+import { getUsers } from '../requests'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -46,19 +45,47 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginLeft: theme.spacing(1),
   },
-}));
+}))
 
 const MainView = () => {
-    const classes = useStyles();
+    const classes = useStyles()
     const [employees, setEmployees] = useState([])
+    const [editorOpen, setEditorOpen] = useState(false)
+    const [employee, setEmployee] = useState({})
+
+    const handleOpen = () => {
+      setEditorOpen(true)
+    }
+
+    const handleClose = () => {
+      getUsers()
+        .then(resp => {
+          console.log(resp)
+          setEmployees(resp.data)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+
+      setEditorOpen(false)
+    }
 
     useEffect(() => {
-      axios.get('http://localhost:3000/api/users').then(resp => {
-        console.log(resp)
-        setEmployees(resp.data)
-      });
-    }, []);
+      getUsers()
+        .then(resp => {
+          console.log(resp)
+          setEmployees(resp.data)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    }, [])
 
+    useEffect(() => {
+      if (employee['_id']) {
+        handleOpen()
+      }
+    }, [employee])
 
     return (
     <React.Fragment>
@@ -66,21 +93,31 @@ const MainView = () => {
       <AppBar position="absolute" color="default" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" color="inherit" noWrap>
-            Travelers HR Tool Thingy
+            Generic HR App
           </Typography>
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Employee Data Tool
+            Employee Data Management Tool
           </Typography>
           <React.Fragment>
-            <React.Fragment>
-              <BasicTable data={employees} />
-            </React.Fragment>
+            <BasicTable 
+              data={employees} 
+              setEmployee={setEmployee}
+            />
           </React.Fragment>
         </Paper>
+        {employee['_id'] &&
+          <ModalEditor 
+            handleClose={handleClose} 
+            handleOpen={handleOpen} 
+            editorOpen={editorOpen} 
+            employee={employee}
+            setEmployee={setEmployee}
+          />
+        }
       </main>
     </React.Fragment>
   )
