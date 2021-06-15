@@ -6,8 +6,8 @@ export const getUsers = async () => {
     return axios.get('http://localhost:3000/api/users')
 }
 
-export const createUser = async () => {
-
+export const createUser = async (user) => {
+    return axios.post('http://localhost:3000/api/users', user)
 }
 
 export const patchUser = async (user) => {
@@ -15,6 +15,7 @@ export const patchUser = async (user) => {
     return axios.patch(link, user)
 }
 
-export const deleteUser = async (id) => {
-
+export const deleteUser = async (user) => {
+    let link = linkBase + user._id
+    return axios.delete(link, user)
 }

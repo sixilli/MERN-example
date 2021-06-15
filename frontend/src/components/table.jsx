@@ -36,6 +36,7 @@ export default function BasicTable(props) {
         </TableHead>
         <TableBody>
           {props.data.map((row) => (
+            (row.isActive || props.showActive) &&
             <TableRow key={row._id}>
               <TableCell align="right">{row.name}</TableCell>
               <TableCell align="right">{row.title}</TableCell>

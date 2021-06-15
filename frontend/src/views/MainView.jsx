@@ -7,6 +7,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
 import BasicTable from '../components/Table'
+import TableToolbar from '../components/TableToolbar'
 import ModalEditor from '../components/ModalEditor'
 import { getUsers } from '../requests'
 
@@ -52,29 +53,18 @@ const MainView = () => {
     const [employees, setEmployees] = useState([])
     const [editorOpen, setEditorOpen] = useState(false)
     const [employee, setEmployee] = useState({})
+    const [showActive, setShowActive] = useState(true)
+    const [response, setResponse] = useState([])
+    const [newEmployee, setNewEmployee] = useState(false)
 
-    const handleOpen = () => {
-      setEditorOpen(true)
-    }
-
-    const handleClose = () => {
-      getUsers()
-        .then(resp => {
-          console.log(resp)
-          setEmployees(resp.data)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-
-      setEditorOpen(false)
-    }
+    
 
     useEffect(() => {
       getUsers()
         .then(resp => {
           console.log(resp)
           setEmployees(resp.data)
+          setResponse(resp.data)
         })
         .catch(e => {
           console.log(e)
@@ -87,6 +77,29 @@ const MainView = () => {
       }
     }, [employee])
 
+    useEffect(() => {
+      setEditorOpen(true)
+    }, [newEmployee])
+
+    const handleOpen = () => {
+      setEditorOpen(true)
+    }
+
+    const handleClose = (refreshData) => {
+      if (refreshData) {
+        getUsers()
+          .then(resp => {
+            setResponse(resp.data)
+            setEmployees(resp.data)
+          })
+          .catch(e => {
+            console.log(e)
+          })
+      }
+      setNewEmployee(false)
+      setEmployee({})
+      setEditorOpen(false)
+    }
     return (
     <React.Fragment>
       <CssBaseline />
@@ -103,9 +116,15 @@ const MainView = () => {
             Employee Data Management Tool
           </Typography>
           <React.Fragment>
+            <TableToolbar 
+              showActive={showActive}
+              setShowActive={setShowActive}
+              setNewEmployee={setNewEmployee}
+            />
             <BasicTable 
               data={employees} 
               setEmployee={setEmployee}
+              showActive={showActive}
             />
           </React.Fragment>
         </Paper>
@@ -115,6 +134,14 @@ const MainView = () => {
             handleOpen={handleOpen} 
             editorOpen={editorOpen} 
             employee={employee}
+            setEmployee={setEmployee}
+          />
+        }
+        {newEmployee &&
+          <ModalEditor 
+            handleClose={handleClose} 
+            handleOpen={handleOpen} 
+            editorOpen={editorOpen} 
             setEmployee={setEmployee}
           />
         }
